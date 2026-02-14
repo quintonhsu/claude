@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy Valentine's Day</title>
+  <title>Hello</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Georgia', serif;
+      font-family: system-ui, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, #1a0011, #2d0a1f, #1a0011);
+      background: #f5f5f5;
       overflow: hidden;
+      transition: background 1.2s ease;
+    }
+
+    body.romantic {
+      background: linear-gradient(135deg, #1a0011, #2d0a1f, #1a0011);
     }
 
     .container {
@@ -24,28 +29,45 @@
     }
 
     input {
-      font-family: 'Georgia', serif;
       font-size: 1.4rem;
       padding: 0.75rem 1.5rem;
-      border: 2px solid rgba(255, 105, 135, 0.4);
-      border-radius: 30px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
       outline: none;
-      background: rgba(255, 255, 255, 0.08);
-      color: #ffd6e0;
+      background: #fff;
+      color: #333;
       text-align: center;
-      letter-spacing: 0.05em;
-      transition: all 0.4s ease;
-      backdrop-filter: blur(4px);
+      letter-spacing: 0.02em;
+      transition: all 0.8s ease;
     }
 
     input::placeholder {
-      color: rgba(255, 182, 193, 0.5);
+      color: #aaa;
     }
 
     input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
+    }
+
+    body.romantic input {
+      font-family: 'Georgia', serif;
+      border: 2px solid rgba(255, 105, 135, 0.4);
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffd6e0;
+      backdrop-filter: blur(4px);
+      letter-spacing: 0.05em;
+    }
+
+    body.romantic input:focus {
       border-color: #ff6b8a;
       box-shadow: 0 0 25px rgba(255, 107, 138, 0.3);
       background: rgba(255, 255, 255, 0.12);
+    }
+
+    body.romantic input::placeholder {
+      color: rgba(255, 182, 193, 0.5);
     }
 
     #message {
@@ -53,6 +75,7 @@
       font-size: 3rem;
       font-weight: bold;
       min-height: 4rem;
+      font-family: 'Georgia', serif;
       background: linear-gradient(90deg, #ff6b8a, #ff8fb1, #ffc2d4, #ff8fb1, #ff6b8a);
       background-size: 200% auto;
       -webkit-background-clip: text;
@@ -62,7 +85,6 @@
       opacity: 0;
       transform: scale(0.8);
       transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-      text-shadow: none;
     }
 
     #message.visible {
@@ -75,7 +97,6 @@
       100% { background-position: 200% center; }
     }
 
-    /* Floating hearts */
     .heart {
       position: fixed;
       color: rgba(255, 105, 135, 0.6);
@@ -85,17 +106,10 @@
     }
 
     @keyframes floatUp {
-      0% {
-        transform: translateY(0) rotate(0deg) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-100vh) rotate(720deg) scale(0);
-        opacity: 0;
-      }
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(720deg) scale(0); opacity: 0; }
     }
 
-    /* Sparkle particles */
     .sparkle {
       position: fixed;
       width: 4px;
@@ -108,21 +122,11 @@
     }
 
     @keyframes sparkleAnim {
-      0% {
-        transform: scale(0);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1);
-        opacity: 0.8;
-      }
-      100% {
-        transform: scale(0);
-        opacity: 0;
-      }
+      0% { transform: scale(0); opacity: 1; }
+      50% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(0); opacity: 0; }
     }
 
-    /* Ambient floating petals */
     .petal {
       position: fixed;
       width: 10px;
@@ -135,19 +139,12 @@
     }
 
     @keyframes drift {
-      0% {
-        transform: translateY(100vh) rotate(0deg);
-        opacity: 0;
-      }
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
       10% { opacity: 0.6; }
       90% { opacity: 0.6; }
-      100% {
-        transform: translateY(-10vh) rotate(360deg);
-        opacity: 0;
-      }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
     }
 
-    /* Pulsing glow behind message */
     .glow {
       position: absolute;
       width: 300px;
@@ -163,9 +160,7 @@
       transition: opacity 0.6s;
     }
 
-    .glow.visible {
-      opacity: 1;
-    }
+    .glow.visible { opacity: 1; }
 
     @keyframes pulse {
       0%, 100% { transform: translate(-50%, -50%) scale(1); }
@@ -175,7 +170,7 @@
 </head>
 <body>
   <div class="container">
-    <input type="text" id="input" placeholder="Type a name..." autofocus>
+    <input type="text" id="input" placeholder="Type something..." autofocus>
     <div class="glow" id="glow"></div>
     <div id="message"></div>
   </div>
@@ -186,8 +181,8 @@
     const glow = document.getElementById('glow');
     let heartsInterval = null;
     let sparkleInterval = null;
+    let petalInterval = null;
 
-    // Ambient petals
     function createPetal() {
       const petal = document.createElement('div');
       petal.className = 'petal';
@@ -195,14 +190,11 @@
       petal.style.width = (6 + Math.random() * 10) + 'px';
       petal.style.height = petal.style.width;
       petal.style.animationDuration = (8 + Math.random() * 12) + 's';
-      petal.style.animationDelay = Math.random() * 5 + 's';
+      petal.style.animationDelay = Math.random() * 2 + 's';
       document.body.appendChild(petal);
       setTimeout(() => petal.remove(), 20000);
     }
-    for (let i = 0; i < 15; i++) setTimeout(createPetal, i * 400);
-    setInterval(createPetal, 1500);
 
-    // Hearts burst
     function createHeart() {
       const heart = document.createElement('div');
       heart.className = 'heart';
@@ -215,7 +207,6 @@
       setTimeout(() => heart.remove(), 7000);
     }
 
-    // Sparkles
     function createSparkle() {
       const s = document.createElement('div');
       s.className = 'sparkle';
@@ -232,24 +223,30 @@
       if (!heartsInterval) {
         heartsInterval = setInterval(createHeart, 300);
         sparkleInterval = setInterval(createSparkle, 200);
+        petalInterval = setInterval(createPetal, 500);
+        for (let i = 0; i < 10; i++) setTimeout(createPetal, i * 200);
       }
     }
 
     function stopEffects() {
       clearInterval(heartsInterval);
       clearInterval(sparkleInterval);
+      clearInterval(petalInterval);
       heartsInterval = null;
       sparkleInterval = null;
+      petalInterval = null;
     }
 
     input.addEventListener('input', () => {
       const match = input.value.toLowerCase() === 'sunlinlin';
       if (match) {
+        document.body.classList.add('romantic');
         message.textContent = "Happy Valentine's Day!";
         message.classList.add('visible');
         glow.classList.add('visible');
         startEffects();
       } else {
+        document.body.classList.remove('romantic');
         message.classList.remove('visible');
         glow.classList.remove('visible');
         stopEffects();
