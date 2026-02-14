@@ -87,9 +87,26 @@
       transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    #message.visible {
+    #message.visible, #message2.visible {
       opacity: 1;
       transform: scale(1);
+    }
+
+    #message2 {
+      margin-top: 0.5rem;
+      font-size: 2rem;
+      font-weight: bold;
+      min-height: 2.5rem;
+      font-family: 'Georgia', serif;
+      background: linear-gradient(90deg, #ffc2d4, #ff8fb1, #ff6b8a, #ff8fb1, #ffc2d4);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s ease-in-out infinite;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s;
     }
 
     @keyframes shimmer {
@@ -200,12 +217,14 @@
     <input type="text" id="input" placeholder="Type something..." autofocus>
     <div class="glow" id="glow"></div>
     <div id="message"></div>
+    <div id="message2"></div>
   </div>
 
   <script>
     const input = document.getElementById('input');
     const message = document.getElementById('message');
     const glow = document.getElementById('glow');
+    const message2 = document.getElementById('message2');
     const photoLeft = document.getElementById('photoLeft');
     const photoRight = document.getElementById('photoRight');
     let heartsInterval = null;
@@ -272,6 +291,8 @@
         document.body.classList.add('romantic');
         message.textContent = "Happy Valentine's Day!";
         message.classList.add('visible');
+        message2.textContent = "I Love You";
+        message2.classList.add('visible');
         glow.classList.add('visible');
         photoLeft.classList.add('visible');
         photoRight.classList.add('visible');
@@ -279,12 +300,13 @@
       } else {
         document.body.classList.remove('romantic');
         message.classList.remove('visible');
+        message2.classList.remove('visible');
         glow.classList.remove('visible');
         photoLeft.classList.remove('visible');
         photoRight.classList.remove('visible');
         stopEffects();
         setTimeout(() => {
-          if (!message.classList.contains('visible')) message.textContent = '';
+          if (!message.classList.contains('visible')) { message.textContent = ''; message2.textContent = ''; }
         }, 600);
       }
     });
