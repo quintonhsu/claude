@@ -208,6 +208,67 @@
       0%, 100% { transform: translate(-50%, -50%) scale(1); }
       50% { transform: translate(-50%, -50%) scale(1.3); }
     }
+
+    #festivalBtn {
+      position: fixed;
+      bottom: 5vh;
+      left: 50%;
+      transform: translateX(-50%) scale(1);
+      padding: 0.8rem 2rem;
+      font-size: 1.3rem;
+      font-family: system-ui, sans-serif;
+      font-weight: bold;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff6b8a, #ff8fb1);
+      color: #fff;
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s;
+      box-shadow: 0 4px 20px rgba(255, 107, 138, 0.4);
+      animation: none;
+    }
+
+    #festivalBtn.visible {
+      opacity: 1;
+      pointer-events: auto;
+      animation: btnBounce 2s ease-in-out infinite;
+    }
+
+    #festivalBtn:hover {
+      transform: translateX(-50%) scale(1.1);
+      box-shadow: 0 6px 30px rgba(255, 107, 138, 0.6);
+    }
+
+    #festivalBtn:active {
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    @keyframes btnBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
+    }
+
+    .confetti {
+      position: fixed;
+      font-size: 2rem;
+      pointer-events: none;
+      z-index: 100;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg) scale(0.3); opacity: 0; }
+    }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-15deg); }
+      75% { transform: rotate(15deg); }
+    }
   </style>
 </head>
 <body>
@@ -219,6 +280,7 @@
     <div id="message"></div>
     <div id="message2"></div>
   </div>
+  <button id="festivalBtn">🎉 Festival Time! 🎊</button>
 
   <script>
     const input = document.getElementById('input');
@@ -227,6 +289,19 @@
     const message2 = document.getElementById('message2');
     const photoLeft = document.getElementById('photoLeft');
     const photoRight = document.getElementById('photoRight');
+    const festivalBtn = document.getElementById('festivalBtn');
+    const funnyEmojis = ['🎉','🎊','🥳','🎈','🎆','🎇','🪅','🎶','💃','🕺','🎵','🍾','🥂','❤️','💕','💖','🌹','😘','🫶','✨'];
+    let festivalClickCount = 0;
+    const funnyMessages = [
+      "Woohooo! 🥳🥳🥳",
+      "Party harder! 💃🕺",
+      "Can't stop won't stop! 🎶",
+      "You're amazing! 🌟",
+      "More confetti!! 🎊🎊",
+      "LOUDER! 🔊🔊🔊",
+      "This is the way! 🚀",
+      "Legendary! 👑",
+    ];
     let heartsInterval = null;
     let sparkleInterval = null;
     let petalInterval = null;
@@ -296,6 +371,7 @@
         glow.classList.add('visible');
         photoLeft.classList.add('visible');
         photoRight.classList.add('visible');
+        festivalBtn.classList.add('visible');
         startEffects();
       } else {
         document.body.classList.remove('romantic');
@@ -304,11 +380,39 @@
         glow.classList.remove('visible');
         photoLeft.classList.remove('visible');
         photoRight.classList.remove('visible');
+        festivalBtn.classList.remove('visible');
         stopEffects();
         setTimeout(() => {
           if (!message.classList.contains('visible')) { message.textContent = ''; message2.textContent = ''; }
         }, 600);
       }
+    });
+
+    festivalBtn.addEventListener('click', () => {
+      festivalClickCount++;
+      // Emoji confetti explosion
+      const count = Math.min(20 + festivalClickCount * 5, 60);
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const c = document.createElement('div');
+          c.className = 'confetti';
+          c.textContent = funnyEmojis[Math.floor(Math.random() * funnyEmojis.length)];
+          c.style.left = Math.random() * 100 + 'vw';
+          c.style.top = '-40px';
+          c.style.fontSize = (1.2 + Math.random() * 2) + 'rem';
+          c.style.animationDuration = (2 + Math.random() * 3) + 's';
+          document.body.appendChild(c);
+          setTimeout(() => c.remove(), 5000);
+        }, i * 50);
+      }
+      // Funny button text swap
+      const msg = funnyMessages[(festivalClickCount - 1) % funnyMessages.length];
+      festivalBtn.textContent = msg;
+      festivalBtn.style.animation = 'wiggle 0.4s ease';
+      setTimeout(() => {
+        festivalBtn.style.animation = 'btnBounce 2s ease-in-out infinite';
+        festivalBtn.textContent = '🎉 Festival Time! 🎊';
+      }, 1500);
     });
   </script>
 </body>
