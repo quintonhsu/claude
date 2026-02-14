@@ -162,6 +162,31 @@
 
     .glow.visible { opacity: 1; }
 
+    .side-photo {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%) scale(0.9);
+      max-width: 300px;
+      max-height: 80vh;
+      object-fit: cover;
+      border-radius: 16px;
+      opacity: 0;
+      transition: all 0.8s ease;
+      z-index: 5;
+      box-shadow: none;
+      pointer-events: none;
+    }
+
+    .side-photo.left { left: 3vw; }
+    .side-photo.right { right: 3vw; }
+
+    .side-photo.visible {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+      box-shadow: 0 0 30px rgba(255, 105, 135, 0.3);
+      pointer-events: auto;
+    }
+
     @keyframes pulse {
       0%, 100% { transform: translate(-50%, -50%) scale(1); }
       50% { transform: translate(-50%, -50%) scale(1.3); }
@@ -169,6 +194,8 @@
   </style>
 </head>
 <body>
+  <img src="romantic1.jpg" alt="" class="side-photo left" id="photoLeft">
+  <img src="romantic2.jpg" alt="" class="side-photo right" id="photoRight">
   <div class="container">
     <input type="text" id="input" placeholder="Type something..." autofocus>
     <div class="glow" id="glow"></div>
@@ -179,6 +206,8 @@
     const input = document.getElementById('input');
     const message = document.getElementById('message');
     const glow = document.getElementById('glow');
+    const photoLeft = document.getElementById('photoLeft');
+    const photoRight = document.getElementById('photoRight');
     let heartsInterval = null;
     let sparkleInterval = null;
     let petalInterval = null;
@@ -244,11 +273,15 @@
         message.textContent = "Happy Valentine's Day!";
         message.classList.add('visible');
         glow.classList.add('visible');
+        photoLeft.classList.add('visible');
+        photoRight.classList.add('visible');
         startEffects();
       } else {
         document.body.classList.remove('romantic');
         message.classList.remove('visible');
         glow.classList.remove('visible');
+        photoLeft.classList.remove('visible');
+        photoRight.classList.remove('visible');
         stopEffects();
         setTimeout(() => {
           if (!message.classList.contains('visible')) message.textContent = '';
