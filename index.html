@@ -3,50 +3,260 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude Hello</title>
+  <title>Happy Valentine's Day</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: system-ui, sans-serif;
+      font-family: 'Georgia', serif;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      margin: 0;
-      background: #f5f5f5;
+      background: linear-gradient(135deg, #1a0011, #2d0a1f, #1a0011);
+      overflow: hidden;
     }
+
     .container {
       text-align: center;
+      z-index: 10;
+      position: relative;
     }
+
     input {
-      font-size: 1.5rem;
-      padding: 0.5rem 1rem;
-      border: 2px solid #ccc;
-      border-radius: 8px;
+      font-family: 'Georgia', serif;
+      font-size: 1.4rem;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid rgba(255, 105, 135, 0.4);
+      border-radius: 30px;
       outline: none;
-      transition: border-color 0.2s;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffd6e0;
+      text-align: center;
+      letter-spacing: 0.05em;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(4px);
     }
+
+    input::placeholder {
+      color: rgba(255, 182, 193, 0.5);
+    }
+
     input:focus {
-      border-color: #6366f1;
+      border-color: #ff6b8a;
+      box-shadow: 0 0 25px rgba(255, 107, 138, 0.3);
+      background: rgba(255, 255, 255, 0.12);
     }
+
     #message {
-      margin-top: 1.5rem;
-      font-size: 2rem;
+      margin-top: 2rem;
+      font-size: 3rem;
       font-weight: bold;
-      color: #6366f1;
-      min-height: 2.5rem;
+      min-height: 4rem;
+      background: linear-gradient(90deg, #ff6b8a, #ff8fb1, #ffc2d4, #ff8fb1, #ff6b8a);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s ease-in-out infinite;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-shadow: none;
+    }
+
+    #message.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+
+    /* Floating hearts */
+    .heart {
+      position: fixed;
+      color: rgba(255, 105, 135, 0.6);
+      animation: floatUp linear forwards;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(720deg) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* Sparkle particles */
+    .sparkle {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: #ffd6e0;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      animation: sparkleAnim ease-out forwards;
+    }
+
+    @keyframes sparkleAnim {
+      0% {
+        transform: scale(0);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* Ambient floating petals */
+    .petal {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, rgba(255, 105, 135, 0.5), transparent);
+      border-radius: 50% 0 50% 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift linear infinite;
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% {
+        transform: translateY(-10vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Pulsing glow behind message */
+    .glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255, 105, 135, 0.15), transparent 70%);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: pulse 3s ease-in-out infinite;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+
+    .glow.visible {
+      opacity: 1;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.3); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <input type="text" id="input" placeholder="Type something..." autofocus>
+    <input type="text" id="input" placeholder="Type a name..." autofocus>
+    <div class="glow" id="glow"></div>
     <div id="message"></div>
   </div>
+
   <script>
     const input = document.getElementById('input');
     const message = document.getElementById('message');
+    const glow = document.getElementById('glow');
+    let heartsInterval = null;
+    let sparkleInterval = null;
+
+    // Ambient petals
+    function createPetal() {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      petal.style.left = Math.random() * 100 + 'vw';
+      petal.style.width = (6 + Math.random() * 10) + 'px';
+      petal.style.height = petal.style.width;
+      petal.style.animationDuration = (8 + Math.random() * 12) + 's';
+      petal.style.animationDelay = Math.random() * 5 + 's';
+      document.body.appendChild(petal);
+      setTimeout(() => petal.remove(), 20000);
+    }
+    for (let i = 0; i < 15; i++) setTimeout(createPetal, i * 400);
+    setInterval(createPetal, 1500);
+
+    // Hearts burst
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerHTML = ['&#10084;', '&#10083;', '&#9825;'][Math.floor(Math.random() * 3)];
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.bottom = '-20px';
+      heart.style.fontSize = (14 + Math.random() * 24) + 'px';
+      heart.style.animationDuration = (3 + Math.random() * 4) + 's';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 7000);
+    }
+
+    // Sparkles
+    function createSparkle() {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.left = (20 + Math.random() * 60) + 'vw';
+      s.style.top = (20 + Math.random() * 60) + 'vh';
+      s.style.width = s.style.height = (2 + Math.random() * 5) + 'px';
+      s.style.animationDuration = (0.6 + Math.random() * 1) + 's';
+      s.style.background = ['#ffd6e0', '#ff8fb1', '#fff'][Math.floor(Math.random() * 3)];
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 2000);
+    }
+
+    function startEffects() {
+      if (!heartsInterval) {
+        heartsInterval = setInterval(createHeart, 300);
+        sparkleInterval = setInterval(createSparkle, 200);
+      }
+    }
+
+    function stopEffects() {
+      clearInterval(heartsInterval);
+      clearInterval(sparkleInterval);
+      heartsInterval = null;
+      sparkleInterval = null;
+    }
+
     input.addEventListener('input', () => {
-      message.textContent = input.value.toLowerCase() === 'claude' ? 'Hello World' : '';
+      const match = input.value.toLowerCase() === 'sunlinlin';
+      if (match) {
+        message.textContent = "Happy Valentine's Day!";
+        message.classList.add('visible');
+        glow.classList.add('visible');
+        startEffects();
+      } else {
+        message.classList.remove('visible');
+        glow.classList.remove('visible');
+        stopEffects();
+        setTimeout(() => {
+          if (!message.classList.contains('visible')) message.textContent = '';
+        }, 600);
+      }
     });
   </script>
 </body>
